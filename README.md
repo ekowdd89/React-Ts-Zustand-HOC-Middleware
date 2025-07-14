@@ -120,3 +120,99 @@ export function withAuth<T extends object>(Component: React.ComponentType<T>) {
 
 
 ```
+
+
+implementation 
+
+```js
+
+
+import { Route, Routes } from 'react-router-dom'
+import { Navbar } from './components/Navbar'
+import { Home } from './pages/Home'
+import { About } from './pages/About'
+import { SignIn } from './pages/auth/SignIn'
+import { SignUp } from './pages/auth/SignUp'
+import ProtectedDashboard from './pages/protected/ProtectedDashboard'
+
+function App() {
+
+  return (
+    <>
+      <div className='flex flex-col min-h-screen'>
+          <Navbar/>
+          <main className='p-4'>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/about" element={<About />} />
+              <Route path='/signin' element={<SignIn/>} />
+              <Route path='/signup' element={<SignUp/>} />
+              <Route path='/dashboard' element={<ProtectedDashboard />} />
+            </Routes>
+          </main>
+      </div>
+    </>
+  )
+}
+
+export default App
+
+
+
+
+
+import { useAuthStore } from "../../store/authStore"
+import { useNavigate } from 'react-router-dom';
+export const SignIn = () => {
+    const {user, login} = useAuthStore();
+    const navigate = useNavigate();
+
+    const onLogin = () => {
+        login("admin")
+        navigate("/dashboard")
+    }
+    return (
+        <>
+
+            <div>SignIn {user ?? "no user"} </div>
+
+            <button onClick={onLogin}>Login</button>
+
+        </>
+
+    )
+}
+
+
+
+import React from 'react';
+import { useAuthStore } from '../store/authStore';
+
+const Dashboard: React.FC = () => {
+
+    const {user, logout} = useAuthStore();
+  return (
+    <>
+        <div className='flex flex-col p-2 items-center w-full'>
+            <div className='text-2xl text-indigo-600'>Welcome {user} to Dashboard </div>
+            <button onClick={logout} className='p-2 bg-indigo-600 text-white rounded-md'>Logout</button>
+        </div>
+    </>
+  )
+};
+
+export default Dashboard;
+
+
+
+
+import Dashboard from "../Dashboard";
+import { withAuth } from "../../hoc/withAuth";
+
+
+
+const ProtectedDashboard = withAuth(Dashboard);
+
+export default ProtectedDashboard
+
+```
